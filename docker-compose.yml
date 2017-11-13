@@ -1,0 +1,31 @@
+---
+version: '2'
+services:
+  es-app:
+    build:
+      context: .
+    working_dir: /usr/src/app
+    ports:
+      - "8080:8080"
+    volumes:
+      - .gradle:/root/.gradle
+      - .:/usr/src/app
+    environment:
+      - ELASTIC_SEARCH_CLUSTERNAME=myCluster
+      - ELASTIC_SEARCH_HOST=elasticsearch1
+      - ELASTIC_SEARCH_PORT=9300
+      - ELASTIC_SEARCH_XPACK_SECURITY_USER=elastic:changeme
+      - ELASTIC_SEARCH_INDEXNAME=demoindex
+    links:
+      - elasticsearch1
+    depends_on:
+      - elasticsearch1
+  elasticsearch1:
+    image: docker.elastic.co/elasticsearch/elasticsearch:5.6.3
+    environment:
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - cluster.name=myCluster
+    ports:
+      - 9200:9200
+      - 9300:9300
